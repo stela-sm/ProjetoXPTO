@@ -5,6 +5,6 @@ on:
 jobs:
   teste:
     runs-on: ubuntu-latest
-    steps:        
+    steps:
       - name: Baixar Código do Repositório
-      - uses: actions/checkout@v3
+        uses: actions/checkout@v3
