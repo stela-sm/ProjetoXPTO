@@ -3,7 +3,7 @@ on:
   push:
     branches: [main]
 jobs:
-  teste:
+  teste_soma:
     runs-on: ubuntu-latest
     steps:
       - name: Baixar Código do Repositório
@@ -16,14 +16,47 @@ jobs:
         run: pip install pytest
       - name: Executar Teste de Soma
         run: pytest test_soma.py
-      - name: Executar Teste de Subtração
+  teste_subtracao:
+     runs-on: ubuntu-latest
+     steps:
+      - name: Baixar Código do Repositório
+        uses: actions/checkout@v3
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+      - name: Instalar Dependências
+        run: pip install pytest
+      - name: Executar Teste de Subtracao
         run: pytest test_subtracao.py
-      - name: Executar Teste de Multiplicação
+  teste_multiplicacao:
+     runs-on: ubuntu-latest
+     steps:
+      - name: Baixar Código do Repositório
+        uses: actions/checkout@v3
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+      - name: Instalar Dependências
+        run: pip install pytest
+      - name: Executar Teste de Multiplicacao
         run: pytest test_multiplicacao.py
-      - name: Executar Teste de Divisão
+  teste_divisao:
+     runs-on: ubuntu-latest
+     steps:
+      - name: Baixar Código do Repositório
+        uses: actions/checkout@v3
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+      - name: Instalar Dependências
+        run: pip install pytest
+      - name: Executar Teste de Divisao
         run: pytest test_divisao.py
   deploy:
-    needs: teste
+    needs: [teste_soma, teste_subtracao, teste_multiplicacao, teste_divisao]
     runs-on: ubuntu-latest
     steps:
       - run: echo "Deploying application..."
