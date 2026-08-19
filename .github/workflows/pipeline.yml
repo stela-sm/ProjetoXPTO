@@ -16,3 +16,8 @@ jobs:
         run: pip install pytest
       - name: Executar Testes
         run: pytest
+  deploy:
+    needs: teste
+    runs-on: ubuntu-latest
+    steps:
+      -run: echo "Deploying application..."
