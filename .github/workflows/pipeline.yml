@@ -14,8 +14,14 @@ jobs:
           python-version: "3.12"
       - name: Instalar Dependências
         run: pip install pytest
-      - name: Executar Testes
-        run: pytest
+      - name: Executar Teste de Soma
+        run: pytest test_soma.py
+      - name: Executar Teste de Subtração
+        run: pytest test_subtracao.py
+      - name: Executar Teste de Multiplicação
+        run: pytest test_multiplicacao.py
+      - name: Executar Teste de Divisão
+        run: pytest test_divisao.py
   deploy:
     needs: teste
     runs-on: ubuntu-latest
