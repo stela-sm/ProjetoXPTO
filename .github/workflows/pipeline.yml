@@ -1,4 +1,7 @@
 name: pipeline
 on:
-    push:
-        branches: [main]
+  push:
+    branches: [main]
+jobs:
+  teste:
+    runs-on: ubuntu-latest
