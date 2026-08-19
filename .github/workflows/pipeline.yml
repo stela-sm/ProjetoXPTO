@@ -20,4 +20,4 @@ jobs:
     needs: teste
     runs-on: ubuntu-latest
     steps:
-      -run: echo "Deploying application..."
+      - run: echo "Deploying application..."
