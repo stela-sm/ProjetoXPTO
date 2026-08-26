@@ -1,0 +1,22 @@
+name: Pipeline Java
+on:
+  push:
+    branches: [dev-java]
+jobs:
+  teste:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar Código
+        uses: actions/checkout@v4
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'temurin'
+      - name: Rodar Testes com Maven
+        run: mvn test
+  deploy:
+    needs: [ teste ]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Deploying application..."
