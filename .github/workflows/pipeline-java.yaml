@@ -3,20 +3,53 @@ on:
   push:
     branches: [dev-java]
 jobs:
-  teste:
+  linter:
+    name: Análise de Código (Linter)
     runs-on: ubuntu-latest
     steps:
-      - name: Baixar Código
+      - name: Checkout do Código
         uses: actions/checkout@v4
-      - name: Configurar Java
+      - name: Configurar Java JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21
-          distribution: 'temurin'
-      - name: Rodar Testes com Maven
-        run: mvn test
+          java-version: '25'
+          cache: 'maven'
+      - name: Executar Linter (Checkstyles)
+        run: mvn compile checkstyle:check
+      - name: Executar Linter (SpotBugs)
+        run: mvn compile spotbugs:check
+  testes-e-cobertura:
+    needs: [ linter]
+    name: Testes e Cobertura
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+      - name: Configurar Java JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          cache: 'maven'
+      - name: Executar Testes e Validar Cobertura (Mínimo 80%)
+        run: mvn clean verify
+  security:
+    needs: [ testes-e-cobertura, linter]
+    name: Análise de Segurança
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: Executar Dependency Check (OWASP) ou CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java
+
+      - name: Realizar Análise CodeQL
+        uses: github/codeql-action/analyze@v3
   deploy:
-    needs: [ teste ]
+    needs: [ security, testes-e-cobertura, linter]
     runs-on: ubuntu-latest
     steps:
       - run: echo "Deploying application..."
+
