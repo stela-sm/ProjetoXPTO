@@ -5,7 +5,7 @@ import static junit.framework.Assert.assertEquals;
 import static org.example.Calculadora.*;
 
 public class CalculadoraTest extends TestCase {
-    @Test
+
     public void testSum() {
         Double resultado = sum(4D,1D);
         assertEquals(String.valueOf(5.0),"5.0");
