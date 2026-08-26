@@ -1,7 +1,13 @@
 name: Pipeline Java
+
 on:
   push:
     branches: [dev-java]
+
+permissions:
+  security-events: write
+  contents: read
+
 jobs:
   linter:
     name: Análise de Código (Linter)
@@ -9,49 +15,67 @@ jobs:
     steps:
       - name: Checkout do Código
         uses: actions/checkout@v4
+
       - name: Configurar Java JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '25'
+          java-version: '21'
           distribution: 'temurin'
           cache: 'maven'
-      - name: Executar Linter (Checkstyles)
-        run: mvn compile checkstyle:check --batch-mode
+
+      - name: Executar Linter (Checkstyle)
+        run: mvn compile checkstyle:check --batch-mode -q
+
       - name: Executar Linter (SpotBugs)
-        run: mvn compile spotbugs:check --batch-mode
+        run: mvn spotbugs:check --batch-mode -q
+
   testes-e-cobertura:
-    needs: [ linter]
+    needs: [linter]
     name: Testes e Cobertura
     runs-on: ubuntu-latest
     steps:
       - name: Checkout do Código
         uses: actions/checkout@v4
+
       - name: Configurar Java JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '25'
+          java-version: '21'
           distribution: 'temurin'
           cache: 'maven'
+
       - name: Executar Testes e Validar Cobertura (Mínimo 80%)
-        run: mvn clean verify --batch-mode
+        run: mvn clean verify --batch-mode -q
+
   security:
-    needs: [ testes-e-cobertura, linter]
+    needs: [testes-e-cobertura, linter]
     name: Análise de Segurança
     runs-on: ubuntu-latest
     steps:
       - name: Checkout do Código
         uses: actions/checkout@v4
 
-      - name: Executar Dependency Check (OWASP) ou CodeQL
+      - name: Configurar Java JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Inicializar CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: java
 
+      - name: Build para CodeQL
+        run: mvn compile --batch-mode -q
+
       - name: Realizar Análise CodeQL
         uses: github/codeql-action/analyze@v3
+
   deploy:
-    needs: [ security, testes-e-cobertura, linter]
+    needs: [security, testes-e-cobertura, linter]
+    name: Deploy
     runs-on: ubuntu-latest
     steps:
       - run: echo "Deploying application..."
-
