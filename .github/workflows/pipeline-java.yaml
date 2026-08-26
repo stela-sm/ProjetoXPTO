@@ -13,6 +13,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '25'
+          distribution: 'temurin'
           cache: 'maven'
       - name: Executar Linter (Checkstyles)
         run: mvn compile checkstyle:check
@@ -29,6 +30,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '25'
+          distribution: 'temurin'
           cache: 'maven'
       - name: Executar Testes e Validar Cobertura (Mínimo 80%)
         run: mvn clean verify
