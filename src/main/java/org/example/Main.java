@@ -3,16 +3,12 @@ package org.example;
 
 import static org.example.Calculadora.*;
 
+
 public class Main {
-
-
-    static void main() {
-        System.out.println("Hello World");
-        sum(2D, 4D);
-        sub(2D, 4D);
-        mult(2D, 4D);
-        div(2D, 4D);
-
+    public static void main(String[] args) {
+        System.out.println(Calculadora.sum(10.0, 5.0));
+        System.out.println(Calculadora.sub(10.0, 5.0));
+        System.out.println(Calculadora.mult(10.0, 5.0));
+        System.out.println(Calculadora.div(10.0, 5.0));
     }
-
 }
