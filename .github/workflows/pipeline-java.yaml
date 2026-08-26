@@ -16,9 +16,9 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
       - name: Executar Linter (Checkstyles)
-        run: mvn compile checkstyle:check
+        run: mvn compile checkstyle:check --batch-mode
       - name: Executar Linter (SpotBugs)
-        run: mvn compile spotbugs:check
+        run: mvn compile spotbugs:check --batch-mode
   testes-e-cobertura:
     needs: [ linter]
     name: Testes e Cobertura
@@ -33,7 +33,7 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
       - name: Executar Testes e Validar Cobertura (Mínimo 80%)
-        run: mvn clean verify
+        run: mvn clean verify --batch-mode
   security:
     needs: [ testes-e-cobertura, linter]
     name: Análise de Segurança
