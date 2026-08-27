@@ -26,4 +26,9 @@ public class CalculadoraTest extends TestCase {
         Double resultado = div(4D,1D);
         assertEquals(String.valueOf(4.0),"4.0");
     }
+    @Test
+    public void testSquareRoot() {
+        Double resultado = squareRoot(9D);
+        assertEquals(String.valueOf(3.0),"3.0");
+    }
 }

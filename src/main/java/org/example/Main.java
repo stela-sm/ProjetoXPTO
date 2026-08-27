@@ -10,5 +10,6 @@ public class Main {
         System.out.println(Calculadora.sub(10.0, 5.0));
         System.out.println(Calculadora.mult(10.0, 5.0));
         System.out.println(Calculadora.div(10.0, 5.0));
+        System.out.println(Calculadora.squareRoot(9D));
     }
 }
