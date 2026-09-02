@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-26.04, ubuntu-22.04, ubuntu-20.04]
-        java-version: [21, 20, 19]
+        java-version: [21, 20]
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -46,7 +46,7 @@ jobs:
       - name: Configurar Java JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '${{ matrix.java-version }}'
           distribution: 'temurin'
           cache: 'maven'
 
@@ -64,7 +64,7 @@ jobs:
       - name: Configurar Java JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '${{ matrix.java-version }}'
           distribution: 'temurin'
           cache: 'maven'
 
