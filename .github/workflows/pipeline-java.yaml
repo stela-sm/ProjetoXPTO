@@ -36,13 +36,14 @@ jobs:
       - name: Executar Linter (SpotBugs)
         run: mvn spotbugs:check --batch-mode -q
 
+
   testes-e-cobertura:
     needs: [linter]
     name: Testes e Cobertura
 
     strategy:
       matrix:
-        os: [ubuntu-26.04, ubuntu-24.04,  ubuntu-22.04]
+        os: [ubuntu-26.04, ubuntu-24.04, ubuntu-22.04]
         java-version: [21]
 
     runs-on: ${{ matrix.os }}
@@ -61,16 +62,12 @@ jobs:
       - name: Executar Testes e Validar Cobertura (Mínimo 80%)
         run: mvn clean verify --batch-mode -q
 
-  sonar:
-    needs: [testes-e-cobertura,linter]
 
-      strategy:
-      matrix:
-        os: [ubuntu-26.04, ubuntu-24.04, ubuntu-22.04]
-        java-version: [21]
-        
+  sonar:
+    needs: [testes-e-cobertura, linter]
     name: Análise SonarQube
-    runs-on: ${{ matrix.os }}
+
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout do Código
@@ -81,7 +78,7 @@ jobs:
       - name: Configurar Java JDK
         uses: actions/setup-java@v5
         with:
-          java-version: ${{ matrix.java-version }}
+          java-version: 21
           distribution: 'temurin'
           cache: 'maven'
 
@@ -99,6 +96,7 @@ jobs:
           mvn -B verify \
             org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
             -Dsonar.projectKey=stela-sm_ProjetoXPTO
+
 
   security:
     needs: [testes-e-cobertura, linter, sonar]
@@ -127,10 +125,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+
   deploy:
-    needs: [security, testes-e-cobertura, linter]
+    needs: [security, sonar, testes-e-cobertura, linter]
     name: Deploy
     runs-on: ubuntu-latest
 
     steps:
-      - run: echo "Deploying application..."
+      - name: Deploy
+        run: echo "Deploying application..."
