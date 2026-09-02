@@ -18,12 +18,13 @@ jobs:
         java-version: [21]
 
     runs-on: ${{ matrix.os }}
+
     steps:
       - name: Checkout do Código
         uses: actions/checkout@v4
 
       - name: Configurar Java JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java-version }}
           distribution: 'temurin'
@@ -38,13 +39,20 @@ jobs:
   testes-e-cobertura:
     needs: [linter]
     name: Testes e Cobertura
-    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        os: [ubuntu-26.04, ubuntu-22.04]
+        java-version: [21]
+
+    runs-on: ${{ matrix.os }}
+
     steps:
       - name: Checkout do Código
         uses: actions/checkout@v4
 
       - name: Configurar Java JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java-version }}
           distribution: 'temurin'
@@ -55,14 +63,21 @@ jobs:
 
   security:
     needs: [testes-e-cobertura, linter]
-    name: Análise de Segurança  (GitLeaks)
-    runs-on: ubuntu-latest
+    name: Análise de Segurança (GitLeaks)
+
+    strategy:
+      matrix:
+        os: [ubuntu-26.04, ubuntu-22.04]
+        java-version: [21]
+
+    runs-on: ${{ matrix.os }}
+
     steps:
       - name: Checkout do Código
         uses: actions/checkout@v4
 
       - name: Configurar Java JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java-version }}
           distribution: 'temurin'
@@ -77,5 +92,6 @@ jobs:
     needs: [security, testes-e-cobertura, linter]
     name: Deploy
     runs-on: ubuntu-latest
+
     steps:
       - run: echo "Deploying application..."
