@@ -1,0 +1,130 @@
+name: Pipeline Java
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  security-events: write
+  contents: read
+
+jobs:
+  linter:
+    name: Análise de Código (Linter)
+
+    strategy:
+      matrix:
+        os: [ubuntu-26.04, ubuntu-24.04, ubuntu-22.04]
+        java-version: [21]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Executar Linter (Checkstyle)
+        run: mvn compile checkstyle:check --batch-mode -q
+
+      - name: Executar Linter (SpotBugs)
+        run: mvn spotbugs:check --batch-mode -q
+
+  testes-e-cobertura:
+    needs: [linter]
+    name: Testes e Cobertura
+
+    strategy:
+      matrix:
+        os: [ubuntu-26.04, ubuntu-24.04,  ubuntu-22.04]
+        java-version: [21]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Executar Testes e Validar Cobertura (Mínimo 80%)
+        run: mvn clean verify --batch-mode -q
+
+  sonar:
+    needs: [testes-e-cobertura,linter]
+    name: Análise SonarQube
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Java JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Cache SonarQube
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Análise SonarQube
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          mvn -B verify \
+            org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.projectKey=stela-sm_ProjetoXPTO
+
+  security:
+    needs: [testes-e-cobertura, linter, sonar]
+    name: Análise de Segurança (GitLeaks)
+
+    strategy:
+      matrix:
+        os: [ubuntu-26.04, ubuntu-24.04, ubuntu-22.04]
+        java-version: [21]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Verificar Segredos Expostos (Gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    needs: [security, testes-e-cobertura, linter]
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: echo "Deploying application..."
